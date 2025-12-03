@@ -1,0 +1,44 @@
+/* src/pages/Tab3.css
+    Center all content inside Tab3.tsx (both horizontally and vertically)
+*/
+
+/* Make sure page and content take full height so centering works */
+ion-page,
+ion-content {
+  height: 100%;
+}
+
+/* Center everything inside the IonContent for this page */
+ion-content {
+  display: flex;
+  align-items: center;        /* vertical centering */
+  justify-content: center;    /* horizontal centering */
+  flex-direction: column;     /* stack children vertically */
+  text-align: center;         /* center inline text */
+  padding: 0.75rem;           /* small breathing room on narrow screens */
+  box-sizing: border-box;
+}
+
+/* Ensure direct children don't overflow and are centered */
+ion-content > * {
+  width: 100%;
+  max-width: 720px; /* constrain width on large screens */
+  margin: 0 auto;
+}
+
+/* Helpful tweaks for common Ionic elements inside Tab3 */
+ion-item,
+ion-card,
+ion-list,
+ion-grid {
+  align-self: center;
+}
+
+/* Center images and thumbnails */
+img,
+ion-thumbnail {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
