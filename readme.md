@@ -3,9 +3,9 @@
 
 ## Información del Estudiante
 
-- **Nombre:** [Tu nombre completo aquí]
-- **Carrera:** [Tu carrera]
-- **Fecha de inicio:** [Fecha]
+- **Nombre:** David Chamorro
+- **Carrera:** Ing. Informática 
+- **Fecha de inicio:** [03/12/25
 
 ---
 
