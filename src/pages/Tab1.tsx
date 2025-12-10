@@ -1,19 +1,29 @@
-import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonContent, IonHeader,IonPage, IonTitle, IonToolbar, useIonViewDidEnter } from '@ionic/react';
 import {
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
-  IonCardTitle,
-  IonItem,
-  IonLabel,
   IonList,
-  IonThumbnail,
 } from '@ionic/react';
+import { fetchUserRepositories } from '../services/GithubService';
 import './Tab1.css';
-import { logoAndroid } from 'ionicons/icons';
+import React, { useState } from 'react';
+import { RepositoryItem } from '../interfaces/Repositoryitem';
+import RepoItem from '../components/RepoItem';
 
 const Tab1: React.FC = () => {
+const [repos, setRepos] = useState<RepositoryItem[]>([]);
+const loadRepos= async () => {
+  const reposData = await fetchUserRepositories();
+  setRepos(reposData);
+};
+useIonViewDidEnter(() => {
+  console.log('Cargando repositorios al entrar en la vista');
+  loadRepos();
+});
+
+
   return (
     <IonPage>
       <IonHeader>
@@ -33,33 +43,9 @@ const Tab1: React.FC = () => {
       </IonCardHeader>
       <IonCardContent>
         <IonList>
-          <IonItem>
-            <IonThumbnail slot="start">
-              <IonIcon aria-hidden="true" icon={logoAndroid} style={{ width: '40px', height: '40px' }}color='success'/>
-            </IonThumbnail>
-            <IonLabel>Repositorio 1</IonLabel>
-          </IonItem>
-
-          <IonItem>
-            <IonThumbnail slot="start">
-              <IonIcon aria-hidden="true" icon={logoAndroid} style={{ width: '40px', height: '40px' }} color='success'/>
-            </IonThumbnail>
-            <IonLabel>Repositorio 2</IonLabel>
-          </IonItem>
-
-          <IonItem>
-            <IonThumbnail slot="start">
-              <IonIcon aria-hidden="true" icon={logoAndroid} style={{ width: '40px', height: '40px' }} color='success' />
-            </IonThumbnail>
-            <IonLabel>Repositorio 3</IonLabel>
-          </IonItem>
-
-          <IonItem lines="none">
-            <IonThumbnail slot="start">
-              <IonIcon aria-hidden="true" icon={logoAndroid} style={{ width: '40px', height: '40px' }}color='success' />
-            </IonThumbnail>
-            <IonLabel>Repositorio 4</IonLabel>
-          </IonItem>
+          {repos.map((repo, index) => (
+            <RepoItem key={index} repo={repo}/>
+          ))}
         </IonList>
       </IonCardContent>
     </IonCard>
