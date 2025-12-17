@@ -1,9 +1,25 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonViewDidEnter } from '@ionic/react';
 import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle } from '@ionic/react';
 
 import './Tab3.css';
+import { useState } from 'react';
+import { getUserInfo } from '../services/GithubService';
+import { UserInfo } from '../interfaces/UserInfo';
 
 const Tab3: React.FC = () => {
+
+  const [UserInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+
+  const loadUserInfo = async () => {
+    const info = await getUserInfo();
+    setUserInfo(info);
+  };
+
+  useIonViewDidEnter(() => {
+    loadUserInfo();
+  });
+
   return (
     <IonPage>
       <IonHeader>
@@ -18,13 +34,14 @@ const Tab3: React.FC = () => {
           </IonToolbar>
         </IonHeader>
          <IonCard>
-      <img alt="David Chamorro" src="https://img.a.transfermarkt.technology/portrait/big/117682-1440096403.JPG?lm=1" />
+      <img alt={UserInfo?.name} 
+      src={UserInfo?.avatar_url} />
       <IonCardHeader>
-        <IonCardTitle>DavidChamorro</IonCardTitle>
-        <IonCardSubtitle>@Davisek2024</IonCardSubtitle>
+        <IonCardTitle>{UserInfo?.name}</IonCardTitle>
+        <IonCardSubtitle>{UserInfo?.login}</IonCardSubtitle>
       </IonCardHeader>
 
-      <IonCardContent>Soy un estudiante de informática de la UISEK.</IonCardContent>
+      <IonCardContent>{UserInfo?.bio}</IonCardContent>
     </IonCard>
       </IonContent>
     </IonPage>
