@@ -8,7 +8,7 @@ import {
 } from '@ionic/react';
 import { fetchUserRepositories } from '../services/GithubService';
 import './Tab1.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RepositoryItem } from '../interfaces/Repositoryitem';
 import RepoItem from '../components/RepoItem';
 
@@ -22,6 +22,16 @@ useIonViewDidEnter(() => {
   console.log('Cargando repositorios al entrar en la vista');
   loadRepos();
 });
+
+// Escuchar evento global para recargar repos al crearse uno nuevo desde Tab2
+useEffect(() => {
+  const handler = () => {
+    console.log('Evento recibo: repos:updated -> recargando repositorios');
+    loadRepos();
+  };
+  window.addEventListener('repos:updated', handler as EventListener);
+  return () => window.removeEventListener('repos:updated', handler as EventListener);
+}, []);
 
 
   return (

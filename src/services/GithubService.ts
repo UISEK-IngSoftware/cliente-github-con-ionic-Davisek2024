@@ -1,17 +1,27 @@
 import axios from "axios";
 import { RepositoryItem } from "../interfaces/Repositoryitem";
-import { UserInfo } from "../interfaces/UserInfo";
+import { UserInfo } from "../interfaces/Userinfo";
+import AuthService from "./AuthService";
 
 
 const GITHUB_API_URL = import.meta.env.VITE_API_URL;
-const GITHUB_API_TOKEN = import.meta.env.VITE_GITHUB_API_TOKEN;
+const githubApi = axios.create({
+    baseURL: GITHUB_API_URL,
+});
+
+githubApi.interceptors.request.use((config) => {
+  const authHeader = AuthService.getAuthHeaders();
+  if (authHeader) {
+    config.headers.Authorization = authHeader.Authorization;
+  }
+  return config;
+}, error => {
+  return Promise.reject(error);
+});
 
 export const fetchUserRepositories = async (): Promise<RepositoryItem[]> => {
     try {
-        const response = await axios.get(`${GITHUB_API_URL}user/repos`,{
-            headers: {
-                Authorization: `Bearer ${GITHUB_API_TOKEN}`,
-            },
+        const response = await githubApi.get(`/user/repos`,{
             params: {
                 per_page: 100,
                 sort:"created",
@@ -37,10 +47,7 @@ export const fetchUserRepositories = async (): Promise<RepositoryItem[]> => {
 
 export const createRepository = async (repo:RepositoryItem):Promise<void> => {
     try {
-        const response = await axios.post(`${GITHUB_API_URL}user/repos`,repo, {
-            headers:{
-                Authorization: `Bearer ${GITHUB_API_TOKEN}`,
-            },
+        const response = await githubApi.post(`/user/repos`,repo, {
         });
         console.log("Repositorio creado con éxito:", response.data);
     } catch (error) {
@@ -51,10 +58,7 @@ export const createRepository = async (repo:RepositoryItem):Promise<void> => {
 
 export const getUserInfo = async (): Promise<UserInfo | null> => {
   try {
-    const response = await axios.get(`${GITHUB_API_URL}user`, {
-      headers: {
-        Authorization: `Bearer ${GITHUB_API_TOKEN}`,
-      },
+    const response = await githubApi.get(`/user`, {
     });
 
     const userInfo: UserInfo = {
