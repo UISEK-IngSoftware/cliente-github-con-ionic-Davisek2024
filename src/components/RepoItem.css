@@ -1,0 +1,10 @@
+
+.swipe-toggle {
+  pointer-events: auto;
+  z-index: 50;
+  transition: transform 150ms ease;
+}
+
+.swipe-toggle.open {
+  transform: rotate(90deg);
+}

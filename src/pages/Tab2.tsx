@@ -34,8 +34,9 @@ const Tab2: React.FC = () => {
 
     createRepository(RepoFormData)
     .then(() => {
-      // Notificar a Tab1 que los repositorios fueron actualizados
+      // Notificar a Tab1 que los repositorios fueron actualizados y que se creó uno nuevo
       window.dispatchEvent(new CustomEvent('repos:updated'));
+      window.dispatchEvent(new CustomEvent('repos:created', { detail: { message: 'Repositorio creado correctamente.' } }));
       history.push('/tab1');
     })
     .catch(() => {
