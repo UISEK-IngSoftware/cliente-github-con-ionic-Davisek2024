@@ -26,6 +26,7 @@ export const fetchUserRepositories = async (): Promise<RepositoryItem[]> => {
                 per_page: 100,
                 sort:"created",
                 direction:"desc",
+                timestamp: Date.now()
             },
         });
         const repositories: RepositoryItem[] = response.data.map((repo: { name: string; description: string | null; owner?: { avatar_url?: string; login?: string } | null; language?: string | null }) => ({
@@ -86,20 +87,20 @@ export const getUserInfo = async (): Promise<UserInfo | null> => {
   }
 };
 
-// Nota: la API de GitHub utiliza PATCH para actualizar repositorios (no PUT). Se usa PATCH aquí.
+
 export const updateRepository = async (owner: string, repoName: string, data: { name?: string; description?: string | null; }): Promise<Record<string, unknown> | null> => {
   try {
     console.log(`PATCH /repos/${owner}/${repoName} payload:`, data);
     const response = await githubApi.patch(`/repos/${owner}/${repoName}`, data);
     console.log('Repositorio actualizado (status):', response.status, response.data);
-    // Devolver el objeto actualizado para uso inmediato en la UI
+    
     return response.data as Record<string, unknown>;
   } catch (error: unknown) {
     console.error('Hubo un error al actualizar el repositorio:', error);
     const err = error as AxiosError | undefined;
     if (err && err.response) {
       console.error('Error response (status, data):', err.response.status, err.response.data);
-      // Devolver el cuerpo de error para que la UI lo muestre y diagnostique
+      
       return (err.response.data as Record<string, unknown>) ?? null;
     }
     return null;

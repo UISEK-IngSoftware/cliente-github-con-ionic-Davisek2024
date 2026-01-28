@@ -13,7 +13,6 @@ import {
   IonButton
 } from '@ionic/react';
 import { create, trash, chevronForward } from 'ionicons/icons';
-
 const RepoItem: React.FC<{
   repo: RepositoryItem;
   onEdit?: (r: RepositoryItem) => void;
@@ -26,7 +25,7 @@ const RepoItem: React.FC<{
 
   const [isOpen, setIsOpen] = useState(false);
 
-  /* Sync real state from Ionic */
+  //sincronizar desde ionic
   useEffect(() => {
     const el = slidingRef.current as unknown as HTMLElement | null;
     if (!el) return;
@@ -43,7 +42,7 @@ const RepoItem: React.FC<{
     };
   }, []);
 
-  /* Click ANYWHERE except options → close */
+ //logica chevron
   useEffect(() => {
     const handler = (e: Event) => {
       if (!isOpen) return;
@@ -56,26 +55,23 @@ const RepoItem: React.FC<{
       const optionsEl = slidingRef.current
         ?.querySelector('ion-item-options') as HTMLElement | null;
 
-      // Click on chevron
       if (chevronEl && chevronEl.contains(target)) {
         slidingRef.current?.close?.();
         setIsOpen(false);
         return;
       }
 
-      // Click on edit/delete → do nothing
       if (optionsEl && optionsEl.contains(target)) {
         return;
       }
 
-      // Click on the SAME item (red or green zone)
       if (itemEl && itemEl.contains(target)) {
         slidingRef.current?.close?.();
         setIsOpen(false);
         return;
       }
 
-      // Click outside completely
+    
       slidingRef.current?.close?.();
       setIsOpen(false);
     };

@@ -13,11 +13,16 @@ import React, { useState, useEffect } from 'react';
 import { RepositoryItem } from '../interfaces/Repositoryitem';
 import RepoItem from '../components/RepoItem';
 
+import LoadingSpinner from '../components/LoadingSpinner';
+
 const Tab1: React.FC = () => {
+const [loading, setLoading] = useState(false);
 const [repos, setRepos] = useState<RepositoryItem[]>([]);
 const loadRepos= async () => {
+  setLoading(true);
   const reposData = await fetchUserRepositories();
   setRepos(reposData);
+  setLoading(false);
 };
 useIonViewDidEnter(() => {
   console.log('Cargando repositorios al entrar en la vista');
@@ -52,12 +57,12 @@ useEffect(() => {
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
 
-  // Estado para mostrar un toast (reemplaza los alerts de éxito/error)
+  //toasts
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success'|'danger'|'primary'|'warning'>('success');
 
-  // Estado para el repositorio que está en procesamiento (mostrar spinner y cerrar slide)
+  // carga
   const [processingRepoKey, setProcessingRepoKey] = useState<string | null>(null);
 
   const handleEdit = (repo: RepositoryItem) => {
@@ -71,14 +76,14 @@ useEffect(() => {
     if (!selectedRepo) return;
     const owner = selectedRepo.owner ?? (AuthService.getUsername() ?? '');
     const oldName = selectedRepo.name;
-    // Usa los parámetros pasados directamente (desde el Alert) si existen, en vez del estado que es asíncrono
+   
     const nameToSend = typeof nameParam === 'string' ? nameParam : editName;
     const descToSend = typeof descriptionParam === 'string' ? descriptionParam : editDescription;
-
-    // Cerramos el Alert antes de comenzar y marcamos este repo como en procesamiento
+    
     setEditAlertOpen(false);
     const key = `${owner}/${oldName}`;
     setProcessingRepoKey(key);
+    setLoading(true);
 
     console.log('Editando repo:', owner, oldName, '->', nameToSend, descToSend);
 
@@ -88,7 +93,7 @@ useEffect(() => {
     type UpdatedRepo = { name?: string; description?: string | null; owner?: { login?: string; avatar_url?: string }; language?: string | null; message?: string };
     const upd = (updated as UpdatedRepo) ?? null;
 
-    // Si la respuesta contiene campos válidos, actualizamos el estado local
+    
     if (upd && (typeof upd.name === 'string' || typeof upd.description === 'string')) {
       setRepos(prev => prev.map(r => (r.owner === owner && r.name === oldName ? {
         name: typeof upd.name === 'string' ? upd.name : r.name,
@@ -98,7 +103,7 @@ useEffect(() => {
         language: typeof upd.language === 'string' ? upd.language : r.language,
       } : r)));
 
-      // Si alguno de los campos no coincide con lo solicitado, mostrarlo al usuario para diagnóstico
+      
       const nameMismatch = typeof upd.name === 'string' && upd.name !== nameToSend;
       const descMismatch = typeof upd.description === 'string' && upd.description !== descToSend;
       if (nameMismatch || descMismatch) {
@@ -121,6 +126,7 @@ useEffect(() => {
 
     setProcessingRepoKey(null);
     setSelectedRepo(null);
+    setLoading(false);
 
   };
 
@@ -135,6 +141,7 @@ useEffect(() => {
     const name = selectedRepo.name;
     const key = `${owner}/${name}`;
     setProcessingRepoKey(key);
+    setLoading(true);
 
     const success = await deleteRepository(owner, name);
     if (success) {
@@ -151,8 +158,9 @@ useEffect(() => {
     setProcessingRepoKey(null);
     setDeleteAlertOpen(false);
     setSelectedRepo(null);
+    setLoading(false);
   };
-
+//slide
   return (
     <IonPage>
       <IonHeader>
@@ -185,6 +193,7 @@ useEffect(() => {
             );
           })}
         </IonList>
+        <LoadingSpinner isOpen={loading} />
 
         <IonAlert
           isOpen={editAlertOpen}
@@ -217,7 +226,7 @@ useEffect(() => {
               text: 'Guardar',
               handler: (data) => {
                 const d = data as { name?: string; description?: string };
-                // Llamamos confirmEdit directamente con los valores recibidos del Alert (evita la condición de race de setState)
+                
                 confirmEdit(d.name ?? '', d.description ?? '');
               }
             }
@@ -242,7 +251,7 @@ useEffect(() => {
               text: 'Eliminar',
               cssClass: 'danger',
               handler: () => {
-                // cerrar alert y comenzar procesamiento
+              
                 setDeleteAlertOpen(false);
                 confirmDelete();
               }
